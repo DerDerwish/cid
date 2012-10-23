@@ -102,21 +102,27 @@ end
 
 #image links
 get '/:action/:id' do
-  case params[:action]
-  when 'img'    #raw image
-    content_type 'image/jpg'
-    filepath = PICDIR+params[:id]+'.jpg'
-    image filepath
-  when 'thumb'  #thumbnail
-    content_type 'image/jpg'
-    filepath = PICDIR+params[:id]+'_thumb.jpg'
-    image filepath
-  when 'show'   #the image page
-    @id = params[:id]
-    haml :show
+  if File.exists?(PICDIR+params[:id])
+    case params[:action]
+    when 'img'    #raw image
+      content_type 'image/jpg'
+      filepath = PICDIR+params[:id]+'.jpg'
+      image filepath
+    when 'thumb'  #thumbnail
+      content_type 'image/jpg'
+      filepath = PICDIR+params[:id]+'_thumb.jpg'
+      image filepath
+    when 'show'   #the image page
+      @id = params[:id]
+      haml :show
 
+    else
+      @msg='No such action!'
+      haml :error
+    end
   else
-    'No such action!'
+    @msg='This image does not exist!'
+    haml :error
   end
 end
 
@@ -126,6 +132,7 @@ get '/delete/:id/:pwd' do
   if success
     haml :delsuccess
   else
-    'Wrong password or file does not exist!'
+    @msg='Wrong password or file does not exist!'
+    haml :error
   end
 end
