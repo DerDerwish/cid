@@ -1,0 +1,8 @@
+%form(action='/upload' method='post' enctype='multipart/form-data')
+  Picture:
+  %input(type='file' name='image' accept='image/*')
+  %select(name='size')
+    %option(value=0) No resize
+    - SIZES.each_with_index do |r,i|
+      %option(value="#{i+1}")= r.map(&:to_s).join('x')
+  %input(type='submit' value='Upload')

@@ -1,4 +1,10 @@
 cid
-cool image database
+cute image database
+Copyright (C) 2012 Anton Pirogov
+Licensed under the GPLv3
+--------
 
 A ruby sinatra image hosting app
+requires: sinatra, haml, rmagick
+
+usage: run main.rb

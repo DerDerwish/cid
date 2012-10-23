@@ -1,0 +1,17 @@
+!!! 5
+%html
+  %head
+    %link(type='text/css' rel='stylesheet' href="#{url('/cid.css')}")
+    %title Cute Image Database
+  %body
+    #header
+      %h1 cid
+      %h5 Your independent image hoster
+    #content
+      =yield
+    #footer
+      %br
+      %br
+      %div
+        %span(class='footer link')© 2012 Anton Pirogov
+        %a(class='footer link' href='http://github.com/apirogov/cid')cid source
