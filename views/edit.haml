@@ -1,0 +1,39 @@
+%form(action="#{url('/edit/'+@g.id+'/'+@g.password)}" method='post' enctype='multipart/form-data')
+  %input(type='hidden' id='action' name='action')
+  %input(type='hidden' id='val' name='val')
+  %input(type='hidden' id='pic' name='pic')
+  #title
+    %h5 Gallery title:
+    %input#titl(type="text" value="#{@g.title}")
+    %input{type: 'submit', onclick: '$("#val").val($("#titl").val()); $("#action").val("title");', value: 'Rename'}
+    %br
+    %br
+
+  %h5 Pictures:
+  %div#pics
+    - @g.pics.each do |k,v|
+      %div(class='pic')
+        %img(src="/thumb/#{@g.id}/#{k}")
+        %br
+        %input(id="name#{k}" value="#{v}")
+        %input{type: 'submit', onclick: '$("#val").val($("#name'+k+'").val()); $("#pic").val("'+k+'"); $("#action").val("name");', value: 'Rename'}
+        %input{type: 'submit', onclick: '$("#pic").val("'+k+'"); $("#action").val("delete");', value: 'Delete'}
+        %br
+        %br
+
+    Add picture:
+    %input(type='file' name='image' accept='image/*')
+    %select(name='size')
+      %option(value=0) No resize
+      - SIZES.each_with_index do |r,i|
+        %option(value="#{i+1}")= r.map(&:to_s).join('x')
+    %input{type: 'submit', onclick: '$("#action").val("add");', value: 'Upload'}
+
+%br
+%br
+%span#gdel{class: 'footer', style: 'color:red;', onclick:'$("#gdelconfirm").show();'} Delete Gallery
+%div#gdelconfirm(style='display:none;')
+  Are you sure?
+  %button{onclick:'window.location="'+url("/destroy/#{@g.id}/")+'"+document.URL.split("/").reverse()[0]'} Yes
+  %button{onclick:'$("#gdelconfirm").hide();'} No
+

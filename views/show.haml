@@ -1,4 +1,21 @@
-%a(href="/img/#{@id}")
-  %img(src="/thumb/#{@id}")
+%h3= @g.title
+- @g.pics.each do |k,v|
+  %div
+    %a(href="/img/#{@g.id}/#{k}")
+      %img(src="/thumb/#{@g.id}/#{k}")
+    %br
+    %span#label= v
+    %br
+    %br
 %br
-Click to view full size
+
+%span(class='footer' style='color: gray;')Click on thumbnails to view full size
+%span#editshow
+  |
+  %span{class: 'footer', style: 'color:blue;', onclick:'$("#editshow").hide(); $("#edit").show();'} Edit Gallery
+
+%div#edit(style='display:none;')
+  Password:
+  %input(type='password' name='pwd' id='pwd')
+  %button{onclick:'window.location="'+url("/edit/#{@g.id}/")+'"+$("#pwd").val()'} Edit Gallery
+

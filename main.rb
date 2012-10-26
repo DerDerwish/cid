@@ -5,134 +5,164 @@
 
 require 'sinatra'
 require 'haml'
-require 'RMagick'
 
-#initialization
+require './gallery'
 
-PICDIR='data/'
+#constants
+
+BASEDIR='data/'
 SIZES=[[100,75],[150,112],[320,240], \
        [640,480],[800,600],[1024,768], \
        [1366,768],[1440,900],[1280,1024], \
        [1600,1200],[1900,1200]]
 
-Dir.mkdir(PICDIR) if !File.exists?(PICDIR)
-File.write('nextid','0') if !File.exists?('nextid')
-
-#helper functions
-
-#get next pic id and increase counter
-def nextid
-  id = File.readlines('nextid')[0]
-  File.write('nextid',"#{id.to_i+1}")
-  return id
-end
-
-#get password for image
-def getpwd(picid)
-  File.readlines(PICDIR+picid)[0]
-end
-
-#generate random password
-def genpwd
-  8.times.map{Random.rand(16)}.map{|n| n.to_s(16)}.join
-end
-
-#return image binary data
-def image(path)
-    img = Magick::Image.read(path)[0]
-    img.to_blob
-end
-
-#save image + thumbnail + password
-#input: data=image blob, size=size option index
-def saveimg(data, size)
-  id = nextid
-
-  #resize if neccessary
-  if size!=0
-    tmp = Magick::Image.from_blob(data)[0]
-    tmp.format = 'JPG'
-    data = tmp.adaptive_resize(SIZES[size-1][0],SIZES[size-1][1]).to_blob
-  end
-
-  #create thumbnail (shrink if neccessary)
-  thumb = data
-  pic = Magick::Image.from_blob(data)[0]
-  scale = 320.to_f/[pic.columns, pic.rows].max.to_f
-  thumb = pic.thumbnail(scale).to_blob if scale<1
-
-  #write files
-  File.write(PICDIR+id, genpwd)
-  File.write(PICDIR+id+'.jpg', data)
-  File.write(PICDIR+id+'_thumb.jpg', thumb)
-
-  return id
-end
-
-#delete an image with given id
-#using the password for verification
-def delimg(id, pwd)
-  return false if pwd != getpwd(id)
-
-  #delete files
-  File.delete(PICDIR+id)
-  File.delete(PICDIR+id+'.jpg')
-  File.delete(PICDIR+id+'_thumb.jpg')
-  return true
-rescue
-  return false #error occured - probably file does not exist
+#0 = no resize, >0 = resize to SIZES[-1]
+def size_from_select(id)
+  id = id.to_i
+  return nil if id==0
+  return SIZES[id-1]
 end
 
 #routes
+
+#TODO: route to rename gallery and pictures
 
 get '/' do
   haml :index
 end
 
 #upload response
-post '/upload' do
+post '/create' do
   pic = params[:image][:tempfile].read
-  size = params[:size].to_i
+  name = params[:image][:filename]
+  size = size_from_select params[:size]
 
-  @id = saveimg pic, size
-  @showlink = url("/show/#{@id}")
-  @dellink = url("/delete/#{@id}/#{getpwd(@id)}")
+  #create gallery and add pictures
+  g = Gallery.new
+  g.add pic,name,size
+
+  #user response
+  @showlink = url("/show/#{g.id}")
+  @password = g.password
   haml :upload
 end
 
-#image links
-get '/:action/:id' do
-  if File.exists?(PICDIR+params[:id])
-    case params[:action]
-    when 'img'    #raw image
-      content_type 'image/jpg'
-      filepath = PICDIR+params[:id]+'.jpg'
-      image filepath
-    when 'thumb'  #thumbnail
-      content_type 'image/jpg'
-      filepath = PICDIR+params[:id]+'_thumb.jpg'
-      image filepath
-    when 'show'   #the image page
-      @id = params[:id]
-      haml :show
+#gallery view page
+get '/show/:id' do
+  g = Gallery.open(params[:id])
+  if !g
+    @msg='This gallery does not exist!'
+    halt haml(:error)
+  end
 
-    else
-      @msg='No such action!'
-      haml :error
+  @g = g
+  haml :show
+end
+
+#gallery edit page
+get '/edit/:id/:pwd' do
+  g = Gallery.open(params[:id])
+  if !g
+    @msg='Gallery does not exist!'
+    halt haml(:error)
+  end
+  if params[:pwd]!=g.password
+    @msg='Wrong password!'
+    halt haml(:error)
+  end
+
+  @g = g
+  haml :edit
+end
+
+#to be called from edit page
+post '/edit/:id/:pwd' do
+  #actions: prename(pid,name), grename(name), pdelete(pid), padd(image,name)
+  g = Gallery.open(params[:id])
+  if !g
+    @msg='Gallery does not exist!'
+    halt (haml :error)
+  end
+  if params[:pwd]!=g.password
+      @msg='Wrong password!'
+      halt haml(:error)
+  end
+
+  case params[:action]
+  when 'title'
+    if params[:val].nil?
+      @msg='title: Value missing!'
+      halt haml(:error)
     end
+    g.title params[:val]
+
+  when 'name'
+    if params[:pic].nil? || params[:val].nil?
+      @msg='name: Picture ID or value missing!'
+      halt haml(:error)
+    end
+    g.setname params[:pic], params[:val]
+
+  when 'delete'
+    if params[:pic].nil?
+      @msg='delete: Picture ID missing!'
+      halt haml(:error)
+    end
+    g.delete params[:pic]
+
+  when 'add'
+    if params[:image].nil? || params[:val].nil? || params[:size].nil?
+      @msg='add: image data, size or value missing!'
+      halt haml(:error)
+    end
+    g.add params[:image][:tempfile].read, params[:image][:filename], size_from_select(params[:size])
+
   else
-    @msg='This image does not exist!'
+    @msg='Invalid edit command!'
+    halt haml(:error)
+  end
+
+  #render page back
+  @g = g
+  haml :edit
+end
+
+#to be called from the edit page
+get '/destroy/:id/:pwd' do
+  g = Gallery.open(params[:id])
+  if !g
+    @msg='Gallery does not exist!'
+    halt haml(:error)
+  end
+  if params[:pwd]!=g.password
+    @msg='Wrong password!'
+    haml :error
+  end
+
+  success = g.destroy
+  @msg='Gallery successfully deleted!'
+  haml :success
+end
+
+#direct links to image data files
+get '/:type/:id/:pic' do
+  g = Gallery.open(params[:id])
+  if !g
+    @msg='This gallery does not exist!'
+    halt haml(:error)
+  end
+
+  case params[:type]
+  when 'img'    #raw image
+    content_type 'image/jpg'
+    g.get(params[:pic])
+  when 'thumb'  #thumbnail
+    content_type 'image/jpg'
+    g.get(params[:pic], true)
+  else
+    @msg='No such action!'
     haml :error
   end
 end
 
-#delete link
-get '/delete/:id/:pwd' do
-  success = delimg params[:id], params[:pwd]
-  if success
-    haml :delsuccess
-  else
-    @msg='Wrong password or file does not exist!'
-    haml :error
-  end
-end
+
