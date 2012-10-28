@@ -1,4 +1,4 @@
-
+# encoding: UTF-8
 require 'fileutils'
 require 'json'
 require 'RMagick'
@@ -17,7 +17,8 @@ class Gallery
   #open and return existing gallery
   def self.open(id)
     Gallery.new(id)
-  rescue
+  rescue => ex
+    print ex.backtrace.join("\n")
     nil
   end
 
@@ -199,7 +200,7 @@ class Gallery
 
   #load metadata from file
   def readmeta
-    @meta = JSON.parse File.readlines(@path+'.meta').join
+    @meta = JSON.parse open(@path+'.meta','r:UTF-8').read
   end
 
   #save changes to metadata

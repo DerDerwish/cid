@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 #cid - cute image database
 #Copyright (C) 2012 Anton Pirogov
 #Licensed under the GPLv3
