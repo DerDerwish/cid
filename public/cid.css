@@ -12,14 +12,15 @@ h5 {margin-top: 2px;}
 .link:hover {color:blue; text-decoration:none}
 
 .link {
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.footer {
   border-style: dashed;
   border-width: 1px;
   border-color: gray;
   border-radius: 5px;
-}
-.footer {
-  margin-top: 10px;
-  font-size: 12px;
 }
 
 .text {

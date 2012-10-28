@@ -2,12 +2,18 @@
   %input(type='hidden' id='action' name='action')
   %input(type='hidden' id='val' name='val')
   %input(type='hidden' id='pic' name='pic')
+
+  %a(class='link' style='color:blue;' href="#{url("/show/#{@g.id}")}") Back to gallery page
+  %br
+  %br
+
   #title
     %small Gallery title:
     %input#titl(type="text" value="#{@g.title}")
     %input{type: 'submit', onclick: '$("#val").val($("#titl").val()); $("#action").val("title");', value: 'Rename'}
     %br
     %br
+  #description
     %small Description (Markdown):
     %br
     %textarea#desc(rows='5' cols='80')= @g.desc
@@ -27,9 +33,7 @@
         and expires at
         %strong= Time.at(@g.expires).to_s[0..-6]
 
-    %br
-    %br
-
+  #settings
     %small Set expiration date to:
     %select(id='exp')
       %option(value="0") never
@@ -67,7 +71,7 @@
 
 %br
 %br
-%span#gdel{class: 'footer', style: 'color:red;', onclick:'$("#gdelconfirm").show();'} Delete Gallery
+%span#gdel{class: 'link', style: 'color:red;', onclick:'$("#gdelconfirm").show();'} Delete Gallery
 %div#gdelconfirm(style='display:none;')
   Are you sure?
   %button{onclick:'window.location="'+url("/destroy/#{@g.id}/")+'"+document.URL.split("/").reverse()[0]'} Yes

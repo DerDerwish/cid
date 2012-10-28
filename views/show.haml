@@ -11,10 +11,10 @@
     %br
 %br
 
-%span(class='footer' style='color: gray;')Click on thumbnails to view full size
+%span(class='link' style='color: gray;')Click on thumbnails to view full size
 %span#editshow
   |
-  %span{class: 'footer', style: 'color:blue;', onclick:'$("#editshow").hide(); $("#edit").show();'} Edit Gallery
+  %span{class: 'link', style: 'color:blue;', onclick:'$("#editshow").hide(); $("#edit").show();'} Edit Gallery
 
 %div#edit(style='display:none;')
   Password:
@@ -23,5 +23,5 @@
 
 %br
 - if @g.expires
-  %span(class='footer' style='color: gray;')This gallery expires at
-  %span(class='footer' style='color: black; font-weight: bold;')= Time.at(@g.expires).to_s[0..-6]
+  %span(class='link' style='color: gray;')This gallery expires at
+  %span(class='link' style='color: black; font-weight: bold;')= Time.at(@g.expires).to_s[0..-6]
