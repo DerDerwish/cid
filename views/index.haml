@@ -5,6 +5,10 @@
     %option(value=0) No resize
     - SIZES.each_with_index do |r,i|
       %option(value="#{i+1}")= r.map(&:to_s).join('x')
+  - if PASSWORD
+    %br
+    Password:
+    %input(type='password' name='pwd' size='10')
   %input(type='submit' value='Go!')
 %br
 %br

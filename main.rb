@@ -19,6 +19,13 @@ SIZES=[[100,75],[150,112],[320,240], \
        [1366,768],[1440,900],[1280,1024], \
        [1600,1200],[1900,1200]]
 
+#optional upload protection (public read-only mode)
+if File.exists?('password.txt')
+  PASSWORD = File.readlines('password.txt')[0].chomp
+else
+  PASSWORD = nil
+end
+
 #0 = no resize, >0 = resize to SIZES[-1]
 def size_from_select(id)
   id = id.to_i
@@ -35,6 +42,11 @@ end
 
 #upload response
 post '/create' do
+  if PASSWORD && params[:pwd]!=PASSWORD
+    @msg='Wrong upload password!'
+    halt haml(:error)
+  end
+
   pic = params[:image][:tempfile].read
   name = params[:image][:filename]
   size = size_from_select params[:size]
