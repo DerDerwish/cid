@@ -51,7 +51,7 @@ class Gallery
       @meta = {'title' => "Gallery #{@id}", 'desc' => '', 'private' => false, 'password' => genchars(10), 'pics' => {}}
       savemeta
     end
-    @permpath = @path+'.permanent'
+    @exppath = @path+'.expires'
   end
 
   #get/set password for gallery
@@ -83,14 +83,21 @@ class Gallery
     savemeta
   end
 
-  #get/set permanent state for gallery
-  #new value = "": false "something": true
-  def permanent(new=nil)
-    return File.exists?(@permpath) if new==nil
-    if !new.to_s.empty?
-      File.write(@permpath,'') if !File.exists?(@permpath)
+  #set time to live for gallery
+  #days = days from now.. 0 = permanent
+  #no param = return date of expiration
+  def expires(days=nil)
+    if days==nil
+      return File.readlines(@exppath)[0].chomp.to_i if File.exists? @exppath
+      return nil #never
+    end
+
+    days = days.to_i
+    if days != 0
+      expiration = (Time.now+86400*days).to_i
+      File.write(@exppath, expiration)
     else
-      File.delete(@permpath) if File.exists?(@permpath)
+      File.delete(@exppath) if File.exists? @exppath
     end
   end
 

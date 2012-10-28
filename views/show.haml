@@ -21,3 +21,7 @@
   %input(type='password' name='pwd' id='pwd')
   %button{onclick:'window.location="'+url("/edit/#{@g.id}/")+'"+$("#pwd").val()'} Edit Gallery
 
+%br
+- if @g.expires
+  %span(class='footer' style='color: gray;')This gallery expires at
+  %span(class='footer' style='color: black; font-weight: bold;')= Time.at(@g.expires).to_s[0..-6]

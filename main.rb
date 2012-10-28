@@ -2,7 +2,7 @@
 #cid - cute image database
 #Copyright (C) 2012 Anton Pirogov
 #Licensed under the GPLv3
-#TODO: cleanup cron script to remove old temporary galleries
+#TODO: create cron script to remove expired galleries
 
 require 'sinatra'
 require 'haml'
@@ -41,6 +41,7 @@ post '/create' do
   #create gallery and add pictures
   g = Gallery.new
   g.add pic,name,size
+  g.expires 1
 
   #user response
   @showlink = url("/show/#{g.id}")
@@ -109,12 +110,12 @@ post '/edit/:id/:pwd' do
     end
     g.private params[:val]
 
-  when 'permanent'
+  when 'expires'
     if params[:val].nil?
-      @msg='permanent: Value missing!'
+      @msg='expires: Value missing!'
       halt haml(:error)
     end
-    g.permanent params[:val]
+    g.expires params[:val]
 
   when 'desc'
     if params[:val].nil?

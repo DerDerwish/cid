@@ -23,21 +23,25 @@
       - else
         %strong public
         (will appear on start page)
-      and
-      - if @g.permanent
-        %strong permanent
-        (will not be deleted)
-      - else
-        %strong temporary
-        (will be deleted 30 days after last access)
+      - if @g.expires
+        and expires at
+        %strong= Time.at(@g.expires).to_s[0..-6]
+
+    %br
+    %br
+
+    %small Set expiration date to:
+    %select(id='exp')
+      %option(value="0") never
+      - [1,2,7,14,30].each do |i|
+        %option(value="#{i+1}")= "#{i} day#{i==1?'':'s'} from now"
+    %input{type: 'submit', onclick: '$("#val").val($("#exp option:selected").val()); $("#action").val("expires");', value: 'Update expiration'}
+    |
     - if @g.private
       %input{type: 'submit', onclick: '$("#val").val(""); $("#action").val("private");', value: 'Make public'}
     - else
       %input{type: 'submit', onclick: '$("#val").val("yes"); $("#action").val("private");', value: 'Make private'}
-    - if @g.permanent
-      %input{type: 'submit', onclick: '$("#val").val(""); $("#action").val("permanent");', value: 'Make temporary'}
-    - else
-      %input{type: 'submit', onclick: '$("#val").val("yes"); $("#action").val("permanent");', value: 'Make permanent'}
+
     %br
     %br
 
