@@ -60,6 +60,12 @@ get '/show/:id' do
   haml :show
 end
 
+#gallery edit page without password -> error
+get '/edit/:id/' do
+  @msg='Invalid gallery password!'
+  haml :error
+end
+
 #gallery edit page
 get '/edit/:id/:pwd' do
   g = Gallery.open(params[:id])

@@ -15,16 +15,29 @@
     %input{type: 'submit', onclick: '$("#val").val($("#desc").val()); $("#action").val("desc");', value: 'Change description'}
     %br
     %br
-    %small Options:
-    %br
+    %small
+      Gallery is
+      - if @g.private
+        %strong private
+        (will not appear on start page)
+      - else
+        %strong public
+        (will appear on start page)
+      and
+      - if @g.permanent
+        %strong permanent
+        (will not be deleted)
+      - else
+        %strong temporary
+        (will be deleted 30 days after last access)
     - if @g.private
-      %input{type: 'submit', onclick: '$("#val").val(""); $("#action").val("private");', value: 'Set gallery public'}
+      %input{type: 'submit', onclick: '$("#val").val(""); $("#action").val("private");', value: 'Make public'}
     - else
-      %input{type: 'submit', onclick: '$("#val").val("yes"); $("#action").val("private");', value: 'Set gallery private (will not appear on startpage)'}
+      %input{type: 'submit', onclick: '$("#val").val("yes"); $("#action").val("private");', value: 'Make private'}
     - if @g.permanent
-      %input{type: 'submit', onclick: '$("#val").val(""); $("#action").val("permanent");', value: 'Make gallery temporary (deleted 30 days after last access)'}
+      %input{type: 'submit', onclick: '$("#val").val(""); $("#action").val("permanent");', value: 'Make temporary'}
     - else
-      %input{type: 'submit', onclick: '$("#val").val("yes"); $("#action").val("permanent");', value: 'Make gallery permanent'}
+      %input{type: 'submit', onclick: '$("#val").val("yes"); $("#action").val("permanent");', value: 'Make permanent'}
     %br
     %br
 
