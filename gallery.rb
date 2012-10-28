@@ -11,14 +11,28 @@ class Gallery
     @@base = 'data/'
   end
   Dir.mkdir(@@base) if !Dir.exists?(@@base)
-  File.write('nextid','0') if !File.exists?('nextid')
 
   attr_reader :path, :id
 
+  #open and return existing gallery
   def self.open(id)
     Gallery.new(id)
   rescue
     nil
+  end
+
+  #open and return a random public gallery
+  #count: at most N galleries
+  #used for start page
+  def self.open_random(count=1)
+    g = galleries.shuffle
+    ret = []
+    g.each do |id|
+      gal = Gallery.open id
+      ret << gal if !gal.private
+      break if ret.length == count
+    end
+    return ret
   end
 
   #create new or open existing gallery
@@ -31,30 +45,58 @@ class Gallery
       end
       readmeta
     else
-      @id = nextid
+      @id = genid
       @path = @@base+@id+'/'
       Dir.mkdir @path
-      @meta = {'title' => "Gallery #{@id}", 'password' => genpwd, 'pics' => {}}
+      @meta = {'title' => "Gallery #{@id}", 'desc' => '', 'private' => false, 'password' => genchars(10), 'pics' => {}}
       savemeta
     end
+    @permpath = @path+'.permanent'
   end
 
-  #get password for gallery
+  #get/set password for gallery
   def password(newpwd=nil)
     return @meta['password'] if !newpwd
     @meta['password'] = newpwd
     savemeta
   end
 
-  #get picture IDs and their labels
-  def pics
-    @meta['pics']
-  end
-
+  #get/set title for gallery
   def title(newname=nil)
     return @meta['title'] if !newname
     @meta['title'] = newname
     savemeta
+  end
+
+  #get/set description for gallery
+  def desc(newtext=nil)
+    return @meta['desc'] if !newtext
+    @meta['desc'] = newtext
+    savemeta
+  end
+
+  #get/set visibility for gallery
+  #new value = "": false "something": true
+  def private(new=nil)
+    return @meta['private'] if new==nil
+    @meta['private'] = !new.to_s.empty?
+    savemeta
+  end
+
+  #get/set permanent state for gallery
+  #new value = "": false "something": true
+  def permanent(new=nil)
+    return File.exists?(@permpath) if new==nil
+    if !new.to_s.empty?
+      File.write(@permpath,'') if !File.exists?(@permpath)
+    else
+      File.delete(@permpath) if File.exists?(@permpath)
+    end
+  end
+
+  #get picture IDs and their labels
+  def pics
+    @meta['pics']
   end
 
   def setname(picid, name)
@@ -118,25 +160,43 @@ class Gallery
     return true
   end
 
-  private
-  #get next pic id and increase counter
-  def nextid
-    id = File.readlines('nextid')[0]
-    File.write('nextid',"#{id.to_i+1}")
-    return id
+  #list all existing galleries
+  def self.galleries
+    Dir.entries(@@base)-['.','..']
+  end
+
+  #generate gallery id
+  def self.genid
+    hash = genchars 8
+    galls = galleries
+    while galls.index(hash)
+      hash = (hash.to_i(36)+1).to_s(36) #increment
+    end
+    return hash
   end
 
   #generate random 10 character password
-  def genpwd
-    10.times.map{Random.rand(26)}.map{|n| n.to_s(26)}.join
+  def self.genchars(n)
+    n.times.map{Random.rand(36)}.map{|n| n.to_s(36)}.join
   end
 
+  private
+
+  def genid
+    return self.class.genid
+  end
+
+  def genchars(n)
+    return self.class.genchars n
+  end
+
+  #load metadata from file
   def readmeta
     @meta = JSON.parse File.readlines(@path+'.meta').join
   end
 
+  #save changes to metadata
   def savemeta
     File.write @path+'.meta', JSON.generate(@meta)
   end
-
 end

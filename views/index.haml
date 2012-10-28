@@ -1,8 +1,24 @@
 %form(action="#{url('/create')}" method='post' enctype='multipart/form-data')
-  Picture:
+  Upload picture:
   %input(type='file' name='image' accept='image/*')
   %select(name='size')
     %option(value=0) No resize
     - SIZES.each_with_index do |r,i|
       %option(value="#{i+1}")= r.map(&:to_s).join('x')
-  %input(type='submit' value='Upload')
+  %input(type='submit' value='Go!')
+%br
+%br
+
+%h5 Random galleries:
+- if @r.empty?
+  No public galleries found! Maybe
+  %strong you
+  create one?.. :)
+- else
+  - @r.each do |g|
+    %div(id="#{g.id}")
+      %h4= g.title 
+      %br
+      %a(href="#{url('/show/'+g.id)}")
+        - g.pics.keys[0..2].each do |k|
+          %img(src="#{url('/thumb/'+g.id+'/'+k)}")

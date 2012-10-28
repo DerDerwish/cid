@@ -2,9 +2,11 @@
 #cid - cute image database
 #Copyright (C) 2012 Anton Pirogov
 #Licensed under the GPLv3
+#TODO: cleanup cron script to remove old temporary galleries
 
 require 'sinatra'
 require 'haml'
+require 'kramdown'
 
 require './gallery'
 
@@ -25,9 +27,8 @@ end
 
 #routes
 
-#TODO: route to rename gallery and pictures
-
 get '/' do
+  @r = Gallery.open_random(3)
   haml :index
 end
 
@@ -77,7 +78,6 @@ end
 
 #to be called from edit page
 post '/edit/:id/:pwd' do
-  #actions: prename(pid,name), grename(name), pdelete(pid), padd(image,name)
   g = Gallery.open(params[:id])
   if !g
     @msg='Gallery does not exist!'
@@ -95,6 +95,27 @@ post '/edit/:id/:pwd' do
       halt haml(:error)
     end
     g.title params[:val]
+
+  when 'private'
+    if params[:val].nil?
+      @msg='private: Value missing!'
+      halt haml(:error)
+    end
+    g.private params[:val]
+
+  when 'permanent'
+    if params[:val].nil?
+      @msg='permanent: Value missing!'
+      halt haml(:error)
+    end
+    g.permanent params[:val]
+
+  when 'desc'
+    if params[:val].nil?
+      @msg='desc: Value missing!'
+      halt haml(:error)
+    end
+    g.desc params[:val]
 
   when 'name'
     if params[:pic].nil? || params[:val].nil?

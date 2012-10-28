@@ -1,10 +1,12 @@
 %h3= @g.title
+#desc= Kramdown::Document.new(@g.desc).to_html
+%br
 - @g.pics.each do |k,v|
   %div
     %a(href="/img/#{@g.id}/#{k}")
       %img(src="/thumb/#{@g.id}/#{k}")
     %br
-    %span#label= v
+    %small= v
     %br
     %br
 %br

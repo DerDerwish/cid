@@ -3,9 +3,28 @@
   %input(type='hidden' id='val' name='val')
   %input(type='hidden' id='pic' name='pic')
   #title
-    %h5 Gallery title:
+    %small Gallery title:
     %input#titl(type="text" value="#{@g.title}")
     %input{type: 'submit', onclick: '$("#val").val($("#titl").val()); $("#action").val("title");', value: 'Rename'}
+    %br
+    %br
+    %small Description (Markdown):
+    %br
+    %textarea#desc(rows='5' cols='80')= @g.desc
+    %br
+    %input{type: 'submit', onclick: '$("#val").val($("#desc").val()); $("#action").val("desc");', value: 'Change description'}
+    %br
+    %br
+    %small Options:
+    %br
+    - if @g.private
+      %input{type: 'submit', onclick: '$("#val").val(""); $("#action").val("private");', value: 'Set gallery public'}
+    - else
+      %input{type: 'submit', onclick: '$("#val").val("yes"); $("#action").val("private");', value: 'Set gallery private (will not appear on startpage)'}
+    - if @g.permanent
+      %input{type: 'submit', onclick: '$("#val").val(""); $("#action").val("permanent");', value: 'Make gallery temporary (deleted 30 days after last access)'}
+    - else
+      %input{type: 'submit', onclick: '$("#val").val("yes"); $("#action").val("permanent");', value: 'Make gallery permanent'}
     %br
     %br
 
