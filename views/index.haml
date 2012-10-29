@@ -21,8 +21,9 @@
 - else
   - @r.each do |g|
     %div(id="#{g.id}")
-      %h4= g.title 
+      %a(class="link" href="#{url('/show/'+g.id)}")
+        %h4= g.title 
       %br
-      %a(href="#{url('/show/'+g.id)}")
-        - g.pics.keys[0..2].each do |k|
+      - g.pics.keys[0..2].each do |k|
+        %a(href="#{url('/img/'+g.id+'/'+k)}" rel="lightbox[#{g.id}]")
           %img(src="#{url('/thumb/'+g.id+'/'+k)}")

@@ -71,9 +71,10 @@
 
 %br
 %br
-%span#gdel{class: 'link', style: 'color:red;', onclick:'$("#gdelconfirm").show();'} Delete Gallery
+%button#gdel{style: 'color:red;', onclick:'$("#gdelconfirm").show();'} Delete Gallery
 %div#gdelconfirm(style='display:none;')
   Are you sure?
+  %br
   %button{onclick:'window.location="'+url("/destroy/#{@g.id}/")+'"+document.URL.split("/").reverse()[0]'} Yes
   %button{onclick:'$("#gdelconfirm").hide();'} No
 

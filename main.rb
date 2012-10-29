@@ -3,7 +3,9 @@
 #cid - cute image database
 #Copyright (C) 2012 Anton Pirogov
 #Licensed under the GPLv3
-#TODO: create cron script to remove expired galleries
+#TODO ideas: multiple file upload, show progress?
+#use ajax - no page reload?
+#CLI uploader?
 
 require 'sinatra'
 require 'haml'
