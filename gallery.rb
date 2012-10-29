@@ -141,12 +141,21 @@ class Gallery
 
   #get picture from gallery or its thumbnail
   def get(picid, thumb=false)
-    picid=picid.to_s
-    picid=picid+'_thumb' if thumb
-    img = Magick::Image.read(@path+picid)[0]
+    p = get_path picid, thumb
+    return nil if !p
+    img = Magick::Image.read(p)[0]
     img.to_blob
   rescue
     nil
+  end
+
+  #get picture path from gallery
+  def get_path(picid, thumb=false)
+    picid=picid.to_s
+    picid=picid+'_thumb' if thumb
+    p=@path+picid
+    return p if File.exists? p
+    return nil
   end
 
   #remove picture from gallery

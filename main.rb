@@ -6,6 +6,9 @@
 #TODO ideas: multiple file upload, show progress?
 #use ajax - no page reload?
 #CLI uploader?
+#forbid unsupported images -> mime-types gem... serve correct mime!
+#let SVG alone!
+#title click -> homepage
 
 require 'sinatra'
 require 'haml'
@@ -197,11 +200,13 @@ get '/:type/:id/:pic' do
 
   case params[:type]
   when 'img'    #raw image
-    content_type 'image/jpg'
-    g.get(params[:pic])
+    content_type `file -b --mime-type #{g.get_path(params[:pic])}`
+    dat = g.get(params[:pic])
+
   when 'thumb'  #thumbnail
-    content_type 'image/jpg'
-    g.get(params[:pic], true)
+    content_type `file -b --mime-type #{g.get_path(params[:pic], true)}`
+    dat = g.get(params[:pic], true)
+
   else
     @msg='No such action!'
     haml :error
