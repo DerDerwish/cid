@@ -200,12 +200,12 @@ get '/:type/:id/:pic' do
 
   case params[:type]
   when 'img'    #raw image
-    content_type `file -b --mime-type #{g.get_path(params[:pic])}`
-    dat = g.get(params[:pic])
+    content_type `file -b --mime-type #{g.get_path(params[:pic])}`.chomp
+    g.get(params[:pic])
 
   when 'thumb'  #thumbnail
-    content_type `file -b --mime-type #{g.get_path(params[:pic], true)}`
-    dat = g.get(params[:pic], true)
+    content_type `file -b --mime-type #{g.get_path(params[:pic], true)}`.chomp
+    g.get(params[:pic], true)
 
   else
     @msg='No such action!'
