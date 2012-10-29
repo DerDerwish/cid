@@ -125,7 +125,6 @@ class Gallery
     #resize if neccessary
     if size
       tmp = Magick::Image.from_blob(data)[0]
-      tmp.format = 'JPG'
       data = tmp.adaptive_resize(size[0],size[1]).to_blob
     end
 
