@@ -4,7 +4,7 @@
 - @g.pics.each do |k,v|
   %div
     %a(href="#{url("/img/#{@g.id}/#{k}")}" rel='lightbox[gallery]' title="#{v}")
-      %img(src="#{url("/thumb/#{@g.id}/#{k}")}")
+      %img(class='thumb' src="#{url("/thumb/#{@g.id}/#{k}")}")
     %br
     %small= v
     %br

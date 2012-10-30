@@ -26,4 +26,4 @@
       %br
       - g.pics.keys[0..2].each do |k|
         %a(href="#{url('/img/'+g.id+'/'+k)}" rel="lightbox[#{g.id}]")
-          %img(src="#{url('/thumb/'+g.id+'/'+k)}")
+          %img(class='thumb' src="#{url('/thumb/'+g.id+'/'+k)}")

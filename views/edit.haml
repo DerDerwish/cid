@@ -54,7 +54,7 @@
   %div#pics
     - @g.pics.each do |k,v|
       %div(class='pic')
-        %img(src="/thumb/#{@g.id}/#{k}")
+        %img(class='thumb' src="/thumb/#{@g.id}/#{k}")
         %br
         %input(id="name#{k}" value="#{v}")
         %input{type: 'submit', onclick: '$("#val").val($("#name'+k+'").val()); $("#pic").val("'+k+'"); $("#action").val("name");', value: 'Rename'}

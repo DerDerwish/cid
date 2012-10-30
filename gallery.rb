@@ -128,14 +128,20 @@ class Gallery
       data = tmp.adaptive_resize(size[0],size[1]).to_blob
     end
 
-    #create thumbnail (shrink if neccessary)
-    thumb = data
-    pic = Magick::Image.from_blob(data)[0]
-    scale = 320.to_f/[pic.columns, pic.rows].max.to_f
-    thumb = pic.thumbnail(scale).to_blob if scale<1
-
+    #write original
     File.write(@path+picid, data)
-    File.write(@path+picid+'_thumb', thumb)
+
+    #create thumbnail (shrink if neccessary and not svg)
+    if !is_svg? picid
+      thumb = data
+      pic = Magick::Image.from_blob(data)[0]
+      scale = 320.to_f/[pic.columns, pic.rows].max.to_f
+      thumb = pic.thumbnail(scale).to_blob if scale<1
+      File.write(@path+picid+'_thumb', thumb)
+    else #is svg file!
+      File.write(@path+picid+'_thumb', data)
+    end
+
     savemeta
   end
 
@@ -143,8 +149,7 @@ class Gallery
   def get(picid, thumb=false)
     p = get_path picid, thumb
     return nil if !p
-    mime = get_mime picid
-    if mime == 'image/svg+xml'
+    if is_svg? picid
       File.readlines(p).join
     else
       img = Magick::Image.read(p)[0]
@@ -209,6 +214,10 @@ class Gallery
   end
 
   private
+
+  def is_svg? picid
+    get_mime(picid) == 'image/svg+xml'
+  end
 
   def genid
     return self.class.genid
