@@ -3,12 +3,9 @@
 #cid - cute image database
 #Copyright (C) 2012 Anton Pirogov
 #Licensed under the GPLv3
-#TODO ideas: multiple file upload, show progress?
+#TODO ideas:
+#multiple file upload, show progress?
 #use ajax - no page reload?
-#CLI uploader?
-#forbid unsupported images -> mime-types gem... serve correct mime!
-#let SVG alone!
-#title click -> homepage
 
 require 'sinatra'
 require 'haml'
@@ -200,11 +197,11 @@ get '/:type/:id/:pic' do
 
   case params[:type]
   when 'img'    #raw image
-    content_type `file -b --mime-type #{g.get_path(params[:pic])}`.chomp
+    content_type g.get_mime(params[:pic])
     g.get(params[:pic])
 
   when 'thumb'  #thumbnail
-    content_type `file -b --mime-type #{g.get_path(params[:pic], true)}`.chomp
+    content_type g.get_mime(params[:pic])
     g.get(params[:pic], true)
 
   else

@@ -6,6 +6,11 @@ body {
 h1 {margin-bottom: 2px;}
 h5 {margin-top: 2px;}
 
+.cidtitle:link {color:black; text-decoration:none}
+.cidtitle:visited {color:black; text-decoration:none}
+.cidtitle:active {color:black; text-decoration:underline}
+.cidtitle:hover {color:black; text-decoration:none}
+
 .link:link {color:black; text-decoration:none}
 .link:visited {color:black; text-decoration:none}
 .link:active {color:black; text-decoration:underline}

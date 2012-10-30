@@ -143,8 +143,13 @@ class Gallery
   def get(picid, thumb=false)
     p = get_path picid, thumb
     return nil if !p
-    img = Magick::Image.read(p)[0]
-    img.to_blob
+    mime = get_mime picid
+    if mime == 'image/svg+xml'
+      File.readlines(p).join
+    else
+      img = Magick::Image.read(p)[0]
+      img.to_blob
+    end
   rescue
     nil
   end
@@ -155,6 +160,13 @@ class Gallery
     picid=picid+'_thumb' if thumb
     p=@path+picid
     return p if File.exists? p
+    return nil
+  end
+
+  #get mime type
+  def get_mime(picid)
+    p = get_path picid
+    return `file -b --mime-type #{get_path picid}`.chomp if p
     return nil
   end
 
