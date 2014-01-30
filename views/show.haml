@@ -1,26 +1,35 @@
 %h3= @g.title
 #desc= Kramdown::Document.new(@g.desc).to_html
 %br
-- @g.pics.each do |k,v|
-  %div
-    %a(href="#{url("/img/#{@g.id}/#{k}")}" rel='lightbox[gallery]' title="#{v}")
-      %img(class='thumb' src="#{url("/thumb/#{@g.id}/#{k}")}")
-    %br
-    %small= v
-    %br
-    %br
-%br
+- if PASSWORD && !@g.activated
+  This gallery is not activated yet.
+  %br
+  %br
+  Please enter the site password (<b>not</b> the gallery password):
+  %form(action="#{url('/activate')}" method='post' enctype='multipart/form-data')
+    %input(type='password' name='pwd' size='10')
+    %input(type='hidden' name='id' value="#{@g.id}")
+    %input(type='submit' value='Activate!')
+- else
+  - @g.pics.each do |k,v|
+    %div
+      %a(href="#{url("/img/#{@g.id}/#{k}")}" rel='lightbox[gallery]' title="#{v}")
+        %img(class='thumb' src="#{url("/thumb/#{@g.id}/#{k}")}")
+      %br
+      %small= v
+      %br
+      %br
+  %br
 
-%span(class='link' style='color: gray;')Click on thumbnails to view full size
-%span#editshow
-  |
-  %span{class: 'link', style: 'color:blue;', onclick:'$("#editshow").hide(); $("#edit").show();'} Edit Gallery
+  %span(class='link' style='color: gray;')Click on thumbnails to view full size
+  %span#editshow
+    |
+    %span{class: 'link', style: 'color:blue;', onclick:'$("#editshow").hide(); $("#edit").show();'} Edit Gallery
 
-%div#edit(style='display:none;')
-  Password:
-  %input(type='password' name='pwd' id='pwd')
-  %button{onclick:'window.location="'+url("/edit/#{@g.id}/")+'"+$("#pwd").val()'} Edit Gallery
-
+  %div#edit(style='display:none;')
+    Password:
+    %input(type='password' name='pwd' id='pwd')
+    %button{onclick:'window.location="'+url("/edit/#{@g.id}/")+'"+$("#pwd").val()'} Edit Gallery
 %br
 - if @g.expires
   %span(class='link' style='color: gray;')This gallery expires at

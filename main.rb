@@ -44,11 +44,6 @@ end
 
 #upload response
 post '/create' do
-  if PASSWORD && params[:pwd]!=PASSWORD
-    @msg='Wrong upload password!'
-    halt haml(:error)
-  end
-
   pic = params[:image][:tempfile].read
   name = params[:image][:filename]
   size = size_from_select params[:size]
@@ -57,11 +52,33 @@ post '/create' do
   g = Gallery.new
   g.add pic,name,size
   g.expires 1
+  g.activated(true) if !PASSWORD
 
   #user response
   @showlink = url("/show/#{g.id}")
   @password = g.password
   haml :upload
+end
+
+post '/activate' do
+  if PASSWORD && params[:pwd]!=PASSWORD
+    @msg='Wrong activation password!'
+    halt haml(:error)
+  end
+
+  puts params[:id]
+
+  #Mostly same as show
+  g = Gallery.open(params[:id])
+  if !g
+    @msg='This gallery does not exist!'
+    halt haml(:error)
+  end
+
+  g.activated(true) #Gallery activated
+
+  @g = g
+  haml :show
 end
 
 #gallery view page

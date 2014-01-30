@@ -30,7 +30,7 @@ class Gallery
     ret = []
     g.each do |id|
       gal = Gallery.open id
-      ret << gal if !gal.private
+      ret << gal if !gal.private && (!PASSWORD || (PASSWORD && gal.activated))
       break if ret.length == count
     end
     return ret
@@ -49,7 +49,7 @@ class Gallery
       @id = genid
       @path = @@base+@id+'/'
       Dir.mkdir @path
-      @meta = {'title' => "Gallery #{@id}", 'desc' => '', 'private' => false, 'password' => genchars(10), 'pics' => {}}
+      @meta = {'title' => "Gallery #{@id}", 'desc' => '', 'private' => false, 'password' => genchars(10), 'pics' => {}, 'activated' => false}
       savemeta
     end
     @exppath = @path+'.expires'
@@ -83,6 +83,15 @@ class Gallery
     @meta['private'] = !new.to_s.empty?
     savemeta
   end
+
+  #get/set activated status (if the site needs admin password)
+  #new value = "": false "something": true
+  def activated(new=nil)
+    return @meta['activated'] if new==nil
+    @meta['activated'] = !new.to_s.empty?
+    savemeta
+  end
+
 
   #set time to live for gallery
   #days = days from now.. 0 = permanent
